@@ -13,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/user-service")
 public class UserController {
@@ -33,9 +36,13 @@ public class UserController {
     }
 
     @GetMapping("/welcome")
-    public String welcome() {
+    public Map<String, Object> welcome() {
 //        return env.getProperty("greeting.message");
-        return greeting.getMessage();
+//        return greeting.getMessage();
+        return Map.of(
+                "message", "메인화면 입니다.",
+                "features", List.of("login", "mypage")
+        );
     }
 
     @PostMapping("/users")
