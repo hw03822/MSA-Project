@@ -1,5 +1,5 @@
 server:
-  port: 0
+  port: 0 # 랜덤 포트
 
 spring:
   application:
@@ -23,7 +23,7 @@ eureka:
       register-with-eureka: true
       fetch-registry: true
       service-url:
-        defaultZone: http://127.0.0.1:8761/eureka
+        defaultZone: http://127.0.0.1:8761/eureka # Discovery Eureka 설정 주가
 
 greeting:
   message: Welcome to the Simple E-comerce.
