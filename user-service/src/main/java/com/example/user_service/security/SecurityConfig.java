@@ -1,11 +1,15 @@
 package com.example.user_service.security;
 
+import com.example.user_service.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -16,19 +20,30 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    private UserService userService;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private Environment env;
 
+    public SecurityConfig(Environment env, UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.env = env;
+        this.userService = userService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+    // 권한과 관련된 메소드
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests((authz) -> authz
-//                    .requestMatchers(new AntPathRequestMatcher("/users", "POST")).permitAll()
-                        .anyRequest().authenticated()
+                    .requestMatchers(new AntPathRequestMatcher("/**")).permitAll() // 모든 사용자 요청 통과
+//                        .anyRequest().authenticated()
 
                 )
                 .addFilterBefore(
-                        getAuthenticationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)))
+                        getAuthenticationFilter(authenticationManager(http))
+//                        getAuthenticationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)))
                         , UsernamePasswordAuthenticationFilter.class
                 );
 
@@ -49,16 +64,28 @@ public class SecurityConfig {
         return source;
     }
 
-    // 인증/인가 설정
+    // 인증 설정
     private AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
         AuthenticationFilter authenticationFilter = new AuthenticationFilter();
         authenticationFilter.setAuthenticationManager(authenticationManager);
-
+//        return new AuthenticationFilter(authenticationManager, userService, env);
         return authenticationFilter;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(HttpSecurity http/*AuthenticationConfiguration authenticationConfiguration*/) throws Exception {
+//        return authenticationConfiguration.getAuthenticationManager();
+
+        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        builder.userDetailsService(userService)
+                .passwordEncoder(passwordEncoder());
+        return builder.build();
     }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    
 }

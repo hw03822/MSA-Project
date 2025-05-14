@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/user-service")
+@RequestMapping("/")
 public class UserController {
     private Environment env;
     private UserService userService;

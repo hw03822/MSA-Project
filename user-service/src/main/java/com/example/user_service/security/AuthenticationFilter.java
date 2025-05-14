@@ -18,7 +18,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
-                                                HttpServletResponse response) throws AuthenticationException {
+                                                HttpServletResponse response) throws AuthenticationException { // 요청정보를 보냈을때 처리해주는 메소드
         try {
             RequestLogin creds = new ObjectMapper().readValue(request.getInputStream(), RequestLogin.class);
 
@@ -38,7 +38,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request,
                                             HttpServletResponse response,
                                             FilterChain chain,
-                                            Authentication authResult) throws IOException, ServletException {
+                                            Authentication authResult) throws IOException, ServletException { //인증이 되었을 때 어떤 처리 작업을 하는 곳
 
     }
 }
