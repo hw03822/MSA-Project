@@ -42,8 +42,8 @@ public class SecurityConfig {
 
                 )
                 .addFilterBefore(
-                        getAuthenticationFilter(authenticationManager(http))
-//                        getAuthenticationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)))
+//                        getAuthenticationFilter(authenticationManager(http))
+                        getAuthenticationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)))
                         , UsernamePasswordAuthenticationFilter.class
                 );
 
@@ -66,26 +66,21 @@ public class SecurityConfig {
 
     // 인증 설정
     private AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter();
-        authenticationFilter.setAuthenticationManager(authenticationManager);
-//        return new AuthenticationFilter(authenticationManager, userService, env);
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager, userService, env);
+//        authenticationFilter.setAuthenticationManager(authenticationManager); 생성자를 통해서 만들어지니까 필요없어짐
         return authenticationFilter;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http/*AuthenticationConfiguration authenticationConfiguration*/) throws Exception {
-//        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(/*HttpSecurity http*/AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
 
-        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        builder.userDetailsService(userService)
-                .passwordEncoder(passwordEncoder());
-        return builder.build();
+//        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+//        builder.userDetailsService(userService)
+//                .passwordEncoder(bCryptPasswordEncoder);
+//        return builder.build();
     }
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
-    
+
 }
