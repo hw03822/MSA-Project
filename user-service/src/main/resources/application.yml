@@ -31,3 +31,7 @@ greeting:
 logging:
   level:
     com.example.user_service: DEBUG
+
+token:
+  expiration_time: 86400000 # 하루짜리 토큰 생성
+  secret : mySuperSecureKeyThatIsDefinitelyAtLeastSixtyFourBytesLong!!!123456
